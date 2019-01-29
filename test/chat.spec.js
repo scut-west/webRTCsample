@@ -1,5 +1,5 @@
 const request = require('supertest');
-const { app } = require('../server');
+const { app, resetNumClients } = require('../server');
 const { expect } = require('chai');
 const coldBrew = require('cold-brew');
 const {By, Key, until } = require("selenium-webdriver");
@@ -70,6 +70,18 @@ describe('client-side messenger application', function() {
 			{innerText: 'Hello World'}
 		).then((found) => {
 			if(found) done();
+		});
+	});
+
+	it('should signal to the server when a client arrives on the page', function(done) {
+		this.timeout(2000);
+		client.get(ADDRESS);
+		client.waitUntilSendSignaling([
+			'join'
+		]).then((sent) => {
+			if(sent) {
+				done();
+			}
 		});
 	});
 

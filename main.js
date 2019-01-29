@@ -1,4 +1,17 @@
+let socket = null;
+let isInitiator = false;
+
 $(document).ready(() => {
+	socket = observeSignaling(io());
+	socket.emit('join', (numberClients) => {
+		isInitiator = numberClients === 2;
+		console.log(isInitiator)
+	});
+
+	$(window).on('unload', () => {
+		socket.emit('leave');
+	});
+
 	$('form').on('submit', (e) => {
 		e.preventDefault();
 	});
