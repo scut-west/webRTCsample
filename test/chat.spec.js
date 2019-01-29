@@ -2,7 +2,7 @@ const request = require('supertest');
 const { app } = require('../server');
 const { expect } = require('chai');
 const coldBrew = require('cold-brew');
-const { Key, By, until } = require('selenium-webdriver');
+const {By, Key, until } = require("selenium-webdriver");
 
 describe('server', function() {
 	it('should serve html when a get request is made', function(done) {
@@ -41,7 +41,7 @@ describe('client-side messenger application', function() {
 		client.get(ADDRESS);
 
 		client.do([
-			['sendKeys', 'form input', {type: 'text'}, 'hello word' + Key.ENTER],
+			['sendKeys', 'form input', {type: 'text'}, 'hello world' + Key.ENTER],
 			['click', 'form button', {}]
 		]);
 
@@ -51,9 +51,29 @@ describe('client-side messenger application', function() {
 			expect(url).to.equal(ADDRESS);
 			done();
 		}) ;
+	});
 
-		afterEach(function(done) {
-			client.quit().then(() => done());
+	it('should post a message to your page(not send!)', function(done) {
+		this.timeout(2000);
+		client.get(ADDRESS);
+		client.do([
+			['sendKeys', 'form input', {}, 'Hello World' + Key.ENTER]
+		]);
+		//exception: TypeError: Wait condition must be a promise-like object, function, or a Condition object
+		// client.wait(until.elementLocated(By.css('p.message')));
+		client.wait(function() {
+			return By.css('p.message') !== null;
 		});
-	})
+
+		client.findElementByAttributes(
+			'p.message',
+			{innerText: 'Hello World'}
+		).then((found) => {
+			if(found) done();
+		});
+	});
+
+	afterEach(function(done) {
+		client.quit().then(() => done());
+	});
 });
