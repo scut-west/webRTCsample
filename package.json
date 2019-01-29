@@ -1,0 +1,27 @@
+{
+  "name": "mywebrtc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test-chat": "mocha test/chat.spec.js",
+    "test-video": "mocha test/video.spec.js",
+    "test": "mocha test/*.spec.js",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.2.0",
+    "cold-brew": "^1.0.36",
+    "express": "^4.16.4",
+    "jquery": "^3.3.1",
+    "mocha": "^5.2.0",
+    "selenium-webdriver": "^4.0.0-alpha.1",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
+    "supertest": "^3.4.2",
+    "webrtc-adapter": "^7.2.0"
+  }
+}
