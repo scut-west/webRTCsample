@@ -114,15 +114,19 @@ describe('signaling offer and answer', function() {
 	});
 
 	it('clients should exchange offer and answer', function(done) {
-		this.timeout(15000);
+		this.timeout(5000);
 
 		client1.get(ADDRESS);
 		client2.get(ADDRESS);
 
 		client2.waitUntilSendSignaling(['send_offer']);
-		client1.waitUntilSendSignaling(['receive_offer']);
+		console.log('client2 send_offer');
+		client1.waitUntilReceiveSignaling(['receive_offer']);
+		console.log('client1 receive_offer');
 		client1.waitUntilSendSignaling(['send_answer']);
-		client2.waitUntilSendSignaling(['receive_answer']).then((received) => {
+		console.log('client1 send_answer');
+		client2.waitUntilReceiveSignaling(['receive_answer']).then((received) => {
+			console.log('client2 receive_answer', received);
 			if(received) {
 				done();
 			}

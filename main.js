@@ -48,11 +48,7 @@ createRTC = function() {	//RTCPeerConnection constructor, can use third lib to c
 
 initiateSignaling = function(socket, peerConnection) {
 	peerConnection.createOffer((offer) => {
-		peerConnection.setLocalDescription(offer, (success) => {
-			if(success) console.log('success setLocalDescription');
-		}, (err) => {
-			if(err) throw err;
-		});
+		peerConnection.setLocalDescription(offer);
 		socket.emit('send_offer', offer);
 	}, (err) => {
 		if(err) throw err;
@@ -60,28 +56,16 @@ initiateSignaling = function(socket, peerConnection) {
 
 	socket.on('receive_answer',(answer) => {
 		console.log('receive_answer');
-		peerConnection.setRemoteDescription(answer, (success) => {
-			if(success) console.log('success setRemoteDescription');
-		}, (err) => {
-			if(err) throw err;
-		});
+		peerConnection.setRemoteDescription(answer);
 	})
 }
 
 prepareToReceiveOffer = function(socket, peerConnection) {
 	socket.on('receive_offer', (offer) => {
 		console.log('receive_offer');
-		peerConnection.setRemoteDescription(offer, (success) => {
-			if(success) console.log('success setRemoteDescription');
-		}, (err) => {
-			if(err) throw err;
-		});
+		peerConnection.setRemoteDescription(offer);
 		peerConnection.createAnswer((answer) => {
-			peerConnection.setLocalDescription(answer, (success) => {
-				if(success) console.log('success setLocalDescription');
-			}, (err) => {
-				if(err) throw err;
-			});
+			peerConnection.setLocalDescription(answer);
 			socket.emit('send_answer', answer);
 		}, (err) => {
 			if(err) throw err;

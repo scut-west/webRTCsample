@@ -17,17 +17,17 @@ server.listen(3000, () => {
 	io.on('connection', (socket) => {
 		socket.on('join', (response) => {
 			numClients++;
-			console.log(numClients);
+			// console.log(numClients);
 			response(numClients);
 		});
 
 		socket.on('send_offer', (offer) => {
-			console.log('broadcast receive_offer');
+			// console.log('broadcast receive_offer');
 			socket.broadcast.emit('receive_offer', offer);
 		});
 
 		socket.on('send_answer', (answer) => {
-			console.log('broadcast receive_answer');
+			// console.log('broadcast receive_answer');
 			socket.broadcast.emit('receive_answer', answer);
 		});
 
