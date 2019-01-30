@@ -89,3 +89,48 @@ describe('client-side messenger application', function() {
 		client.quit().then(() => done());
 	});
 });
+
+describe('signaling offer and answer', function() {
+	let client1;
+	let client2;
+
+	beforeEach(function() {
+		resetNumClients(0);
+		client1 = coldBrew.createClient();
+		client2 = coldBrew.createClient();
+	});
+
+	it('offer should be sent by the second person to arrive on the page', function(done) {
+		this.timeout(5000);
+
+		client1.get(ADDRESS);
+		client2.get(ADDRESS);
+
+		client2.waitUntilSendSignaling(['send_offer']).then((sent) => {
+			if(sent) {
+				done();
+			}
+		});
+	});
+
+	it('clients should exchange offer and answer', function(done) {
+		this.timeout(15000);
+
+		client1.get(ADDRESS);
+		client2.get(ADDRESS);
+
+		client2.waitUntilSendSignaling(['send_offer']);
+		client1.waitUntilSendSignaling(['receive_offer']);
+		client1.waitUntilSendSignaling(['send_answer']);
+		client2.waitUntilSendSignaling(['receive_answer']).then((received) => {
+			if(received) {
+				done();
+			}
+		});
+	});
+
+	afterEach(function(done) {
+		client1.quit();
+		client2.quit().then(() => done());
+	});
+});
