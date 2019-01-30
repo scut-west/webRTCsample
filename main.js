@@ -1,5 +1,6 @@
 let socket = null;
 let isInitiator = false;
+let dataChannel = null;
 let peerConnection = null;
 const SERVERS = null;
 
@@ -9,7 +10,7 @@ $(document).ready(() => {
 		isInitiator = numberClients === 2;
 		console.log(isInitiator);
 
-		peerConnection = createRTC();
+		peerConnection = createRTC(socket);
 		if(isInitiator) {
 			initiateSignaling(socket, peerConnection);
 		} else {
@@ -29,6 +30,9 @@ $(document).ready(() => {
 		const message = $(this).siblings()[0].value;
 		handleIncomingMessage(message);
 		$(this).siblings()[0].value = '';
+
+		const data = JSON.stringify({ type:'message', message});
+		dataChannel.send(data);
 	});
 });
 
@@ -38,15 +42,28 @@ handleIncomingMessage = function(message) {
 	$('#chat-window').append(messageElement);
 }
 
-createRTC = function() {	//RTCPeerConnection constructor, can use third lib to create RTCPeerConnection object
+createRTC = function(socket) {	//RTCPeerConnection constructor, can use third lib to create RTCPeerConnection object
 	const peerConnection = coldBrewRTC(
 		SERVERS,
 		{ optional: [{RtcDataChannels: true }] }
 	);
+
+	peerConnection.onicecandidate = (e) => {
+		if(e.candidate) {
+			socket.emit('send_ice_candidate', e.candidate);
+		}
+	}
+
+	socket.on('receive_ice_candidate', (candidate) => {
+		peerConnection.addIceCandidate(candidate);
+	});
+
 	return peerConnection;
 }
 
 initiateSignaling = function(socket, peerConnection) {
+	initiateDataChannel(peerConnection);
+
 	peerConnection.createOffer((offer) => {
 		peerConnection.setLocalDescription(offer);
 		socket.emit('send_offer', offer);
@@ -57,10 +74,18 @@ initiateSignaling = function(socket, peerConnection) {
 	socket.on('receive_answer',(answer) => {
 		console.log('receive_answer');
 		peerConnection.setRemoteDescription(answer);
-	})
+	});
 }
 
 prepareToReceiveOffer = function(socket, peerConnection) {
+	peerConnection.ondatachannel = (e) => {
+		dataChannel = e.channel;
+
+		dataChannel.onmessage = (message) => {
+			const data = JSON.parse(message.data);
+			handleIncomingMessage(data.message);	
+		}
+	}
 	socket.on('receive_offer', (offer) => {
 		console.log('receive_offer');
 		peerConnection.setRemoteDescription(offer);
@@ -71,4 +96,15 @@ prepareToReceiveOffer = function(socket, peerConnection) {
 			if(err) throw err;
 		});
 	});
+}
+
+initiateDataChannel = function(peerConnection) {
+	dataChannel = peerConnection.createDataChannel('messageChannel', { reliable: false});
+
+	dataChannel.onopen = () => {
+		dataChannel.onmessage = (message) => {
+			const data = JSON.parse(message.data);
+			handleIncomingMessage(data.message);	
+		}
+	}
 }

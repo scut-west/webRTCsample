@@ -120,13 +120,27 @@ describe('signaling offer and answer', function() {
 		client2.get(ADDRESS);
 
 		client2.waitUntilSendSignaling(['send_offer']);
-		console.log('client2 send_offer');
 		client1.waitUntilReceiveSignaling(['receive_offer']);
-		console.log('client1 receive_offer');
 		client1.waitUntilSendSignaling(['send_answer']);
-		console.log('client1 send_answer');
 		client2.waitUntilReceiveSignaling(['receive_answer']).then((received) => {
-			console.log('client2 receive_answer', received);
+			if(received) {
+				done();
+			}
+		});
+	});
+
+	it('should be able to send and received ICE Candidates', function(done) {
+		this.timeout(5000);
+
+		client1.get(ADDRESS);
+		client2.get(ADDRESS);
+
+		client1.waitUntilRTCEvents(['icecandidate']);
+		client1.waitUntilSendSignaling(['send_ice_candidate']);
+		client2.waitUntilReceiveSignaling(['receive_ice_candidate']);
+		client2.waitUntilRTCEvents(['icecandidate']);
+		client2.waitUntilSendSignaling(['send_ice_candidate']);
+		client1.waitUntilReceiveSignaling(['receive_ice_candidate']).then((received) => {
 			if(received) {
 				done();
 			}

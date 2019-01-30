@@ -31,6 +31,10 @@ server.listen(3000, () => {
 			socket.broadcast.emit('receive_answer', answer);
 		});
 
+		socket.on('send_ice_candidate', (candidate) => {
+			socket.broadcast.emit('receive_ice_candidate', candidate);
+		});
+
 		socket.on('leave', () => {
 			numClients--;
 			console.log(numClients);
