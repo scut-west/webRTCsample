@@ -2,44 +2,59 @@ let socket = null;
 let isInitiator = false;
 let dataChannel = null;
 let peerConnection = null;
+let localVideoStream = null;
 const SERVERS = null;
 
 $(document).ready(() => {
-	socket = observeSignaling(io());
-	socket.emit('join', (numberClients) => {
-		isInitiator = numberClients === 2;
-		console.log(isInitiator);
+	initLocalVideoStream($('#local-video'));
 
-		peerConnection = createRTC(socket);
-		if(isInitiator) {
-			initiateSignaling(socket, peerConnection);
-		} else {
-			prepareToReceiveOffer(socket, peerConnection);
-		}
-	});
+	// socket = observeSignaling(io());
+	// socket.emit('join', (numberClients) => {
+	// 	isInitiator = numberClients === 2;
+	// 	console.log(isInitiator);
 
-	$(window).on('unload', () => {
-		socket.emit('leave');
-	});
+	// 	peerConnection = createRTC(socket);
+	// 	if(isInitiator) {
+	// 		initiateSignaling(socket, peerConnection);
+	// 	} else {
+	// 		prepareToReceiveOffer(socket, peerConnection);
+	// 	}
+	// });
 
-	$('form').on('submit', (e) => {
-		e.preventDefault();
-	});
+	// $(window).on('unload', () => {
+	// 	socket.emit('leave');
+	// });
 
-	$('#sendMessage').on('click', function () {
-		const message = $(this).siblings()[0].value;
-		handleIncomingMessage(message);
-		$(this).siblings()[0].value = '';
+	// $('form').on('submit', (e) => {
+	// 	e.preventDefault();
+	// });
 
-		const data = JSON.stringify({ type:'message', message});
-		dataChannel.send(data);
-	});
+	// $('#sendMessage').on('click', function () {
+	// 	const message = $(this).siblings()[0].value;
+	// 	handleIncomingMessage(message);
+	// 	$(this).siblings()[0].value = '';
+
+	// 	const data = JSON.stringify({ type:'message', message});
+	// 	dataChannel.send(data);
+	// });
 });
 
 handleIncomingMessage = function(message) {
 	const messageElement = $('<p></p>', { class: 'message'});
 	messageElement.text(message);
 	$('#chat-window').append(messageElement);
+}
+
+initLocalVideoStream = function(element) {
+	var getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+	getUserMedia.call(navigator,{ video: true},
+  		(stream) => {
+  			console.log(element);
+  			localVideoStream = stream;
+  			element[0].srcObject = stream;
+  		}, (err) => {
+  			if(err) console.log(err);
+  		});
 }
 
 createRTC = function(socket) {	//RTCPeerConnection constructor, can use third lib to create RTCPeerConnection object
