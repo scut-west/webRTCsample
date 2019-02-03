@@ -8,35 +8,35 @@ const SERVERS = null;
 $(document).ready(() => {
 	initLocalVideoStream($('#local-video'));
 
-	// socket = observeSignaling(io());
-	// socket.emit('join', (numberClients) => {
-	// 	isInitiator = numberClients === 2;
-	// 	console.log(isInitiator);
+	socket = observeSignaling(io());
+	socket.emit('join', (numberClients) => {
+		isInitiator = numberClients === 2;
+		console.log(isInitiator);
 
-	// 	peerConnection = createRTC(socket);
-	// 	if(isInitiator) {
-	// 		initiateSignaling(socket, peerConnection);
-	// 	} else {
-	// 		prepareToReceiveOffer(socket, peerConnection);
-	// 	}
-	// });
+		peerConnection = createRTC(socket);
+		if(isInitiator) {
+			initiateSignaling(socket, peerConnection);
+		} else {
+			prepareToReceiveOffer(socket, peerConnection);
+		}
+	});
 
-	// $(window).on('unload', () => {
-	// 	socket.emit('leave');
-	// });
+	$(window).on('unload', () => {
+		socket.emit('leave');
+	});
 
-	// $('form').on('submit', (e) => {
-	// 	e.preventDefault();
-	// });
+	$('form').on('submit', (e) => {
+		e.preventDefault();
+	});
 
-	// $('#sendMessage').on('click', function () {
-	// 	const message = $(this).siblings()[0].value;
-	// 	handleIncomingMessage(message);
-	// 	$(this).siblings()[0].value = '';
+	$('#sendMessage').on('click', function () {
+		const message = $(this).siblings()[0].value;
+		handleIncomingMessage(message);
+		$(this).siblings()[0].value = '';
 
-	// 	const data = JSON.stringify({ type:'message', message});
-	// 	dataChannel.send(data);
-	// });
+		const data = JSON.stringify({ type:'message', message});
+		dataChannel.send(data);
+	});
 });
 
 handleIncomingMessage = function(message) {
