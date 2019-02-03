@@ -1,9 +1,15 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-const http = require('http');
+// const http = require('http');
 const https = require('https');
-const server = http.createServer(app);
+const fs = require('fs');
+
+let options = {
+	key: fs.readFileSync('./privatekey.pem'),
+	cert: fs.readFileSync('./certificate.pem')
+};
+const server = https.createServer(options, app);
 const io = require('socket.io')(server);
 
 app.use(express.static(__dirname));

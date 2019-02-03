@@ -53,7 +53,7 @@ initLocalVideoStream = function(element) {
   			localVideoStream = stream;
   			element[0].srcObject = stream;
   		}, (err) => {
-  			if(err) console.log(err);
+  			if(err) console.log(err.message);
   		});
 }
 
